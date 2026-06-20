@@ -137,16 +137,22 @@ For each tool, describe the specific failure mode you're handling and what the a
 
 Write out what a full user interaction looks like from start to finish — tool call by tool call. Use a specific example query.
 
+FitFindr needs to create a fit card for social media. It does this by taking an input of a particular item from the user and finding that item. From there, it creates a wardrobe with similar items and suggests a caption for the user to post the outfit on social media. 
+
 **Example user query:** "I'm looking for a vintage graphic tee under $30. I mostly wear baggy jeans and chunky sneakers. What's out there and how would I style it?"
 
 **Step 1:**
 <!-- What does the agent do first? Which tool is called? With what input? -->
+Using the input, ("vintage graphic tee", size=none, max_price=30.0), the agent uses the tool search_listings to search for any listings similar to the description. After filtering out price and size, it scores each listing based on the relevance and returns a list with the highest scores ranking first. If there are no matches, the agent doesn't return anything (thus, the next steps won't happen).
 
 **Step 2:**
 <!-- What happens next? What was returned from step 1? What tool is called now? -->
+Now, the tool suggest_outfit is called: (new_item=<vintage tee>, wardrobe=<user's wardrobe>). The agent uses one of the listings the user is considering buying and the user's wardrobe to return suggestions on outfits. If the user doesn't have a wardrobe, the tool returns some general styling advice for the listing. 
 
 **Step 3:**
 <!-- Continue until the full interaction is complete -->
+Finally, the tool create_fit_card is called: (outfit=<suggestion>, new_item=<vintage tee>). The tool uses one of the outfits the user picks as well as the same listing the user is considering buying to generate a 2-4 sentence caption for social media. If the outfit field is blank, the tool returns an error message. 
 
 **Final output to user:**
 <!-- What does the user actually see at the end? -->
+"the 2000's are calling and they want their fashion back. this super cute vintage tee was thrifted from depop and makes me sooo happy. more deets on my story"
