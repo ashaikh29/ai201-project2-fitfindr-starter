@@ -147,11 +147,11 @@ Using the input, ("vintage graphic tee", size=none, max_price=30.0), the agent u
 
 **Step 2:**
 <!-- What happens next? What was returned from step 1? What tool is called now? -->
-Now, the tool suggest_outfit is called: (new_item=<vintage tee>, wardrobe=<user's wardrobe>). The agent uses one of the listings the user is considering buying and the user's wardrobe to return suggestions on outfits. If the user doesn't have a wardrobe, the tool returns some general styling advice for the listing. 
+Now, the tool suggest_outfit is called: (new_item=<vintage tee> , wardrobe=<user's wardrobe>). The agent uses one of the listings the user is considering buying and the user's wardrobe to return suggestions on outfits. If the user doesn't have a wardrobe, the tool returns some general styling advice for the listing. 
 
 **Step 3:**
 <!-- Continue until the full interaction is complete -->
-Finally, the tool create_fit_card is called: (outfit=<suggestion>, new_item=<vintage tee>). The tool uses one of the outfits the user picks as well as the same listing the user is considering buying to generate a 2-4 sentence caption for social media. If the outfit field is blank, the tool returns an error message. 
+Finally, the tool create_fit_card is called: (outfit=<suggestion> , new_item=<vintage tee>). The tool uses one of the outfits the user picks as well as the same listing the user is considering buying to generate a 2-4 sentence caption for social media. If the outfit field is blank, the tool returns an error message. 
 
 **Final output to user:**
 <!-- What does the user actually see at the end? -->
