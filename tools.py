@@ -33,6 +33,15 @@ def _get_groq_client():
         )
     return Groq(api_key=api_key)
 
+def _call_llm(messages: list[dict], temperature: float = 0.7) -> str:
+    """Send a chat completion request to Groq and return the text response."""
+    client = _get_groq_client()
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=messages,
+        temperature=temperature,
+    )
+    return response.choices[0].message.content.strip()
 
 # ── Tool 1: search_listings ───────────────────────────────────────────────────
 
@@ -128,8 +137,44 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
 
     Before writing code, fill in the Tool 2 section of planning.md.
     """
-    # Replace this with your implementation
-    return ""
+
+    item_desc = (
+        f"{new_item.get('title', 'this item')} — {new_item.get('description', '')} "
+        f"(category: {new_item.get('category', 'unknown')}, "
+        f"colors: {', '.join(new_item.get('colors', []))}, "
+        f"style: {', '.join(new_item.get('style_tags', []))})"
+    )
+
+    items = wardrobe.get("items", []) if wardrobe else []
+
+    if not items:
+        prompt = (
+            f"A user is considering buying this thrifted item:\n{item_desc}\n\n"
+            "They don't have any wardrobe items on file. Give general styling "
+            "advice for this piece: what kinds of items pair well with it, what "
+            "vibe or aesthetic it suits, and 1-2 outfit ideas using generic "
+            "clothing pieces (not specific items from a closet)."
+        )
+    else:
+        wardrobe_lines = "\n".join(
+            f"- {w.get('name', 'item')} (category: {w.get('category', '')}, "
+            f"colors: {', '.join(w.get('colors', []))}, "
+            f"style: {', '.join(w.get('style_tags', []))})"
+            for w in items
+        )
+        prompt = (
+            f"A user is considering buying this thrifted item:\n{item_desc}\n\n"
+            f"Here is their existing wardrobe:\n{wardrobe_lines}\n\n"
+            "Suggest 1-2 complete outfits that pair the new item with specific "
+            "pieces from their wardrobe (refer to wardrobe items by name). "
+            "Mention color combinations and weather/occasion fit where relevant."
+        )
+
+    return _call_llm(
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7,
+    )
+
 
 
 # ── Tool 3: create_fit_card ───────────────────────────────────────────────────
@@ -161,5 +206,28 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
 
     Before writing code, fill in the Tool 3 section of planning.md.
     """
-    # Replace this with your implementation
-    return ""
+
+    if not outfit or not outfit.strip():
+        return (
+            "Can't generate a fit card without a complete outfit — "
+            "please select an outfit suggestion first."
+        )
+
+    title = new_item.get("title", "this piece")
+    price = new_item.get("price", "?")
+    platform = new_item.get("platform", "a resale app")
+
+    prompt = (
+        f"Write a casual, authentic 2-4 sentence Instagram/TikTok caption for an "
+        f"OOTD post. The post is about a thrifted item called '{title}', bought "
+        f"for ${price} on {platform}. Here is the outfit it's styled with:\n"
+        f"{outfit}\n\n"
+        "Mention the item name, price, and platform naturally (once each), and "
+        "capture the specific vibe of the outfit. Sound like a real person, not "
+        "an ad — casual tone, lowercase is fine, light slang is fine."
+    )
+
+    return _call_llm(
+        messages=[{"role": "user", "content": prompt}],
+        temperature=1.0,
+    )
