@@ -63,3 +63,21 @@ def test_suggest_outfit_with_empty_wardrobe_gives_general_advice():
     assert isinstance(result, str)
     assert len(result) > 0
 
+# ── Tool 3: create_fit_card ───────────────────────────────────────────────────
+def test_create_fit_card_with_complete_outfit():
+    outfit = "Vintage tee with baggy jeans and chunky sneakers."
+    result = create_fit_card(outfit, SAMPLE_ITEM)
+
+    assert isinstance(result, str)
+    assert len(result) > 0
+
+def test_create_fit_card_with_empty_outfit_returns_error_message():
+    result = create_fit_card("", SAMPLE_ITEM)
+
+    assert isinstance(result, str)
+    assert len(result) > 0
+
+def test_create_fit_card_with_whitespace_outfit_returns_error_message():
+    result = create_fit_card("   ", SAMPLE_ITEM)
+
+    assert isinstance(result, str)
