@@ -139,34 +139,34 @@ For each tool, describe the specific failure mode you're handling and what the a
      the planning loop and each individual tool. -->
 ```mermaid
 flowchart TD
+
     A[User Query] --> B[Planning Loop]
 
-    B --> C[Parse user request]
-    C --> D[search_listings(description, size, max_price)]
+    B --> C[search_listings(description, size, max_price)]
 
-    D --> E{Results found?}
-    E -->|No| F[Return error: No listings found]
-    F --> B
+    C --> D{Results Found?}
 
-    E -->|Yes| G[Store selected_item = results[0] in session]
+    D -->|No| E[Error: No listings found]
+    E --> Z[Return to User]
+
+    D -->|Yes| F[results = item list]
+
+    F --> G[Session: selected_item = results[0]]
 
     G --> H[suggest_outfit(selected_item, wardrobe)]
-    H --> I{Wardrobe available?}
 
-    I -->|No| J[Generate general styling advice]
-    I -->|Yes| K[Generate personalized outfit suggestion]
+    H --> I[Session: outfit_suggestion]
 
-    J --> L[Store outfit_suggestion in session]
-    K --> L
+    I --> J[create_fit_card(outfit_suggestion, selected_item)]
 
-    L --> M[create_fit_card(outfit_suggestion, selected_item)]
+    J --> K{Fit Card Generated?}
 
-    M --> N{Fit card created?}
-    N -->|No| O[Return error: missing outfit data]
-    O --> B
+    K -->|No| L[Error: Outfit Data Incomplete]
+    L --> Z
 
-    N -->|Yes| P[Store fit_card in session]
-    P --> Q[Return final session to user]
+    K -->|Yes| M[Session: fit_card]
+
+    M --> N[Return Session]
 ```
 
 
