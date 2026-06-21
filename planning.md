@@ -137,38 +137,66 @@ For each tool, describe the specific failure mode you're handling and what the a
      an embedded image or screenshot cannot be evaluated.
      You'll share this diagram with an AI tool when asking it to implement
      the planning loop and each individual tool. -->
+
 ```mermaid
 flowchart TD
 
-    A["User Query"] --> B["Planning Loop"]
+    A["User Query"] --> B["Planning Loop: new session initialized"]
 
-    B --> C["search_listings(description, size, max_price)"]
+    B --> P["Parse input via regex<br/>session['parsed'] = description, size, max_price"]
+
+    P --> C["Call search_listings(description, size, max_price)"]
 
     C --> D{"Results Found?"}
 
-    D -->|No| E["Error: No listings found"]
-    E --> Z["Return to User"]
+    D -->|"No — empty list"| E["session['error'] = helpful message<br/>(suggest broader description, size, or max_price)"]
+    E --> Z1["Return session early<br/>(suggest_outfit & create_fit_card NOT called)"]
 
-    D -->|Yes| F["results = item list"]
+    D -->|"Yes"| F["session['search_results'] = ranked list"]
 
-    F --> G["Session: selected_item = results[0]"]
+    F --> G["session['selected_item'] = search_results[0]"]
 
-    G --> H["suggest_outfit(selected_item, wardrobe)"]
+    G --> H["Call suggest_outfit(selected_item, wardrobe)"]
 
-    H --> I["Session: outfit_suggestion"]
+    H --> I{"Wardrobe provided<br/>& non-empty?"}
 
-    I --> J["create_fit_card(outfit_suggestion, selected_item)"]
+    I -->|"No / empty"| J["Fallback: return general styling tips<br/>for selected_item (no wardrobe pairing)"]
+    J --> J2["session['outfit_suggestion'] = general styling tips"]
+    J2 --> Z2["Return session early<br/>(create_fit_card NOT called)"]
 
-    J --> K{"Fit Card Generated?"}
+    I -->|"Yes"| K["session['outfit_suggestion'] = 1–2 outfit ideas<br/>(colors, weather, combinations)"]
 
-    K -->|No| L["Error: Outfit Data Incomplete"]
-    L --> Z
+    K --> L["Call create_fit_card(outfit_suggestion, selected_item)"]
 
-    K -->|Yes| M["Session: fit_card"]
+    L --> M{"Outfit complete?"}
 
-    M --> N["Return Session"]
+    M -->|"No / incomplete"| N["session['error'] = 'please select a complete outfit'"]
+    N --> Z3["Return session early<br/>(no fit_card generated)"]
+
+    M -->|"Yes"| O["session['fit_card'] = 2–4 sentence caption<br/>(item name, price, platform, vibe-specific)"]
+
+    O --> Q["Return completed session"]
+
+    %% State store shown as a side panel touched by every step
+    S[("Session State Store<br/>parsed · search_results · selected_item ·<br/>outfit_suggestion · fit_card · error")]
+
+    P -.writes.-> S
+    F -.writes.-> S
+    G -.writes.-> S
+    E -.writes.-> S
+    J2 -.writes.-> S
+    K -.writes.-> S
+    N -.writes.-> S
+    O -.writes.-> S
+
+    style E fill:#3a1f1f,stroke:#c0392b,color:#fff
+    style N fill:#3a1f1f,stroke:#c0392b,color:#fff
+    style J fill:#3a2f1f,stroke:#e67e22,color:#fff
+    style Z1 fill:#2c2c2c,stroke:#888,color:#fff
+    style Z2 fill:#2c2c2c,stroke:#888,color:#fff
+    style Z3 fill:#2c2c2c,stroke:#888,color:#fff
+    style S fill:#1f2a3a,stroke:#3498db,color:#fff
 ```
-
 
 
 ---
