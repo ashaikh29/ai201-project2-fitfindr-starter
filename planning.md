@@ -140,33 +140,33 @@ For each tool, describe the specific failure mode you're handling and what the a
 ```mermaid
 flowchart TD
 
-    A[User Query] --> B[Planning Loop]
+    A["User Query"] --> B["Planning Loop"]
 
-    B --> C[search_listings(description, size, max_price)]
+    B --> C["search_listings(description, size, max_price)"]
 
-    C --> D{Results Found?}
+    C --> D{"Results Found?"}
 
-    D -->|No| E[Error: No listings found]
-    E --> Z[Return to User]
+    D -->|No| E["Error: No listings found"]
+    E --> Z["Return to User"]
 
-    D -->|Yes| F[results = item list]
+    D -->|Yes| F["results = item list"]
 
-    F --> G[Session: selected_item = results[0]]
+    F --> G["Session: selected_item = results[0]"]
 
-    G --> H[suggest_outfit(selected_item, wardrobe)]
+    G --> H["suggest_outfit(selected_item, wardrobe)"]
 
-    H --> I[Session: outfit_suggestion]
+    H --> I["Session: outfit_suggestion"]
 
-    I --> J[create_fit_card(outfit_suggestion, selected_item)]
+    I --> J["create_fit_card(outfit_suggestion, selected_item)"]
 
-    J --> K{Fit Card Generated?}
+    J --> K{"Fit Card Generated?"}
 
-    K -->|No| L[Error: Outfit Data Incomplete]
+    K -->|No| L["Error: Outfit Data Incomplete"]
     L --> Z
 
-    K -->|Yes| M[Session: fit_card]
+    K -->|Yes| M["Session: fit_card"]
 
-    M --> N[Return Session]
+    M --> N["Return Session"]
 ```
 
 
